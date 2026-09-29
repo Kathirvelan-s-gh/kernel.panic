@@ -63,7 +63,7 @@ function esc(t) {
 var log = document.getElementById('log');
 var input = document.getElementById('cmdInput');
 
-// story stuff
+// game state
 var scareLevel = 0;
 var bigScareDone = false;
 var smallScareDone = false;
@@ -75,7 +75,7 @@ var overlayIsUp = false;
 var climaxDone = false;
 var exitCount = 0;
 
-// sound stuff
+// audio
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var ctx = null;
 var droneOsc = null;
@@ -104,9 +104,7 @@ var ghostLines = [
     'the walls are breathing a little. thats normal here.'
 ];
 
-// ------------------------------------------------------------
-// ghost lines that show up by themselves
-// ------------------------------------------------------------
+// random messages
 var ambientTimer = null;
 function ambient() {
     clearTimeout(ambientTimer);
@@ -140,9 +138,7 @@ function ambient() {
     }, 9000 + Math.random() * 10000);
 }
 
-// ------------------------------------------------------------
-// the big scare from do_not_open.txt
-// ------------------------------------------------------------
+// do_not_open scare
 function bigScare() {
     if (bigScareDone == true) {
         return;
@@ -207,9 +203,7 @@ function bigScare() {
     }, 1800);
 }
 
-// ------------------------------------------------------------
-// the small scare when you read the_end.txt
-// ------------------------------------------------------------
+// little scare for the ending
 function smallScare() {
     if (smallScareDone == true) {
         return;
@@ -247,9 +241,7 @@ function smallScare() {
     }, 1200);
 }
 
-// ------------------------------------------------------------
-// the shutdown at the very end
-// ------------------------------------------------------------
+// shut everything down
 function shutdown() {
     if (climaxDone == true) {
         return;
@@ -267,7 +259,7 @@ function shutdown() {
         document.getElementById('ipScreen').style.transition = 'transform 0.3s';
         document.getElementById('ipScreen').style.transform = 'scaleY(0.006)';
 
-        // power down sound
+        // power-down sound
         if (ctx == null) { ctx = new AudioContext(); }
         var o = ctx.createOscillator();
         var g = ctx.createGain();
@@ -281,7 +273,7 @@ function shutdown() {
         o.start();
         o.stop(ctx.currentTime + 0.7);
 
-        // thump
+        // little thump
         var t = ctx.createOscillator();
         var tg = ctx.createGain();
         t.type = 'sine';
@@ -308,9 +300,7 @@ function shutdown() {
     }, 3900);
 }
 
-// ------------------------------------------------------------
-// the "next" command, final frame
-// ------------------------------------------------------------
+// final frame
 function goNext() {
     if (nextIsAllowed == false) {
         log.innerHTML += '<div>nothing to advance right now.</div>';
@@ -347,7 +337,7 @@ function goNext() {
         o.stop(ctx.currentTime + 5.1);
     }, 1900);
 
-    // caption + voice line, then shutdown
+    // show the caption, play the voice, then shut down
     setTimeout(function() {
         document.getElementById('caption').style.opacity = '1';
         var voice = new Audio(audioData);
@@ -365,18 +355,16 @@ function goNext() {
                 shutdown();
             });
         }
-        // in case the audio never finishes
+        // fallback in case the audio gets stuck
         setTimeout(function() {
             shutdown();
         }, 6000);
     }, 4900);
 }
 
-// ------------------------------------------------------------
-// typing commands
-// ------------------------------------------------------------
+// commands
 input.addEventListener('keydown', function(e) {
-    // start the drone the first time you type
+    // start the background sound when typing starts
     if (droneOsc == null) {
         if (ctx == null) { ctx = new AudioContext(); }
         droneOsc = ctx.createOscillator();
@@ -404,7 +392,7 @@ input.addEventListener('keydown', function(e) {
         return;
     }
 
-    // reset the ghost timer since they did something
+    // they did something, so reset the timer
     ambient();
 
     var words = text.trim().split(/\s+/);
@@ -547,9 +535,7 @@ document.body.addEventListener('click', function() {
     input.focus();
 });
 
-// ------------------------------------------------------------
 // start
-// ------------------------------------------------------------
 log.innerHTML += '<div>connecting...</div>';
 setTimeout(function() {
     log.innerHTML += '<div>session started.</div>';
